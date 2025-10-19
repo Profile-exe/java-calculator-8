@@ -42,16 +42,16 @@ public class OperandsExtractor {
                     .map(Integer::parseInt)
                     .toList();
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("피연산자는 숫자만 가능합니다.");
         }
         return operands;
     }
 
     private static void validateNegativeOperands(List<Integer> operands) {
         boolean isNegative = operands.stream()
-                .anyMatch(operand -> operand < 0);
+                .anyMatch(operand -> operand <= 0);
         if (isNegative) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("피연산자는 양수만 가능합니다.");
         }
     }
 
