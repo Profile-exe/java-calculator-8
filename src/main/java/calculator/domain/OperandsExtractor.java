@@ -27,6 +27,15 @@ public class OperandsExtractor {
         String[] strings = input.split(regexStr);
 
         // 피연산자들 정수 배열로 파싱 후 리스트 반환
+        List<Integer> operands = parseToIntegerList(strings);
+
+        // 음수 예외 발생
+        validateNegativeOperands(operands);
+
+        return operands;
+    }
+
+    private static List<Integer> parseToIntegerList(String[] strings) {
         List<Integer> operands;
         try {
             operands = Arrays.stream(strings)
@@ -35,8 +44,15 @@ public class OperandsExtractor {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException();
         }
-
         return operands;
+    }
+
+    private static void validateNegativeOperands(List<Integer> operands) {
+        boolean isNegative = operands.stream()
+                .anyMatch(operand -> operand < 0);
+        if (isNegative) {
+            throw new IllegalArgumentException();
+        }
     }
 
     private static String getDelimiterRegex(Optional<String> customDelimiter) {
