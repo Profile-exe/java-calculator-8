@@ -35,20 +35,38 @@ class OperandsExtractorTest {
     }
 
     @ParameterizedTest(name = "{0}")
-    @MethodSource("invalidInput")
+    @MethodSource("zeroOrNegativeInput")
+    @DisplayName("추출한 피연산자가 양수가 아닌 경우 오류 발생")
+    void 추출한_피연산자가_양수가_아닌_경우_오류_발생(String title, String input) {
+        //when, then
+        assertThatThrownBy(() -> OperandsExtractor.extractOperands(input))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("피연산자는 양수만 가능합니다.");
+    }
+
+    private static Stream<Arguments> zeroOrNegativeInput() {
+        return Stream.of(
+                Arguments.of("구분자 : ;, 0 피연산자 추가", "//;\\n4;0,3"),
+                Arguments.of("구분자 : ;, 음수 피연산자 추가", "//;\\n4;-2,3"),
+                Arguments.of("커스텀 구분자 없음, 음수 피연산자 추가", "1,2:-3")
+        );
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @MethodSource("notIntegerInput")
     @DisplayName("추출한 피연산자가 숫자가 아닌 경우 오류 발생")
     void 추출한_피연산자가_숫자가_아닌_경우_오류_발생(String title, String input) {
         //when, then
         assertThatThrownBy(() -> OperandsExtractor.extractOperands(input))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("피연산자는 숫자만 가능합니다.");
     }
 
-    private static Stream<Arguments> invalidInput() {
+    private static Stream<Arguments> notIntegerInput() {
         return Stream.of(
+                Arguments.of("구분자 : ;, n 문자 추가", "//;\\n4;2,3n"),
                 Arguments.of("구분자 : -, abb 문자열 추가", "//-\\n1abb"),
                 Arguments.of("구분자 : -, ** 문자열 추가", "//-\\n1,2:3**"),
-                Arguments.of("구분자 : ;, 음수 피연산자 추가", "//;\\n4;-2,3"),
-                Arguments.of("구분자 : ;, n 문자 추가", "//;\\n4;2,3n"),
                 Arguments.of("구분자: *, wow 문자열 추가", "//*\\n2*3*4*6*wow"),
                 Arguments.of("구분자: **, test 문자열 추가", "//**\\n2,3**4**test"),
                 Arguments.of("커스텀 구분자 없음, error 문자열 추가", "1,2:3error")
